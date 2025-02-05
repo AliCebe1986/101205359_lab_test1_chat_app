@@ -5,7 +5,6 @@ const User = require('../models/User');
 
 const router = express.Router();
 
-// User Signup
 router.post('/signup', async (req, res) => {
     const { username, firstname, lastname, password } = req.body;
     try {
@@ -17,7 +16,6 @@ router.post('/signup', async (req, res) => {
     }
 });
 
-// User Login
 router.post('/login', async (req, res) => {
     const { username, password } = req.body;
     try {
@@ -30,6 +28,11 @@ router.post('/login', async (req, res) => {
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
+});
+
+
+router.post('/logout', (req, res) => {
+    res.json({ message: "User logged out" });
 });
 
 module.exports = router;
