@@ -19,22 +19,44 @@
     </div>
 
     <script>
-        $(document).ready(function(){
-            $("#loginForm").submit(function(event){
-                event.preventDefault();
-                $.post("http://localhost:5000/auth/login", {
-                    username: $("#loginUsername").val(),
-                    password: $("#loginPassword").val()
-                }, function(response){
-                    localStorage.setItem("token", response.token);
-                    localStorage.setItem("username", response.username);
+        $(document).ready(function () {
+    $("#loginForm").submit(function (event) {
+        event.preventDefault();
+
+        fetch("http://localhost:5000/auth/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                username: $("#loginUsername").val(),
+                password: $("#loginPassword").val(),
+            }),
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert("Login failed: " + data.error);
+                } else {
+                    localStorage.setItem("token", data.token);
+                    localStorage.setItem("username", data.username);
                     alert("Login successful!");
                     window.location.href = "chat.html";
-                }).fail(function(error){
-                    alert("Login failed: " + error.responseJSON.message);
-                });
-            });
+                }
+            })
+            .catch(error => console.error("Error:", error));
+    });
+
+    // Logout button (only if user is logged in)
+    if (localStorage.getItem("token")) {
+        $("body").append('<button id="logout">Logout</button>');
+        $("#logout").click(function () {
+            localStorage.removeItem("token");
+            localStorage.removeItem("username");
+            alert("Logged out successfully!");
+            window.location.href = "login.html";
         });
+    }
+});
+
     </script>
 </body>
 </html>

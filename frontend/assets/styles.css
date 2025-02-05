@@ -31,3 +31,10 @@ button {
 button:hover {
     background: #0056b3;
 }
+
+#typingIndicator {
+    font-size: 14px;
+    font-style: italic;
+    color: gray;
+    margin-top: 5px;
+}

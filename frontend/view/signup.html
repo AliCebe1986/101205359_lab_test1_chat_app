@@ -24,17 +24,29 @@
         $(document).ready(function(){
             $("#signupForm").submit(function(event){
                 event.preventDefault();
-                $.post("http://localhost:5000/auth/signup", {
-                    username: $("#username").val(),
-                    firstname: $("#firstname").val(),
-                    lastname: $("#lastname").val(),
-                    password: $("#password").val()
-                }, function(response){
-                    alert("Signup successful! Please login.");
-                    window.location.href = "login.html";
-                }).fail(function(error){
-                    alert("Signup failed: " + error.responseJSON.error);
-                });
+
+                const userData = {
+                    username: $("#username").val().trim(),
+                    firstname: $("#firstname").val().trim(),
+                    lastname: $("#lastname").val().trim(),
+                    password: $("#password").val().trim()
+                };
+
+                fetch("http://localhost:5000/auth/signup", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(userData)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        alert("Signup failed: " + data.error);
+                    } else {
+                        alert("Signup successful! Please login.");
+                        window.location.href = "login.html";
+                    }
+                })
+                .catch(error => console.error("Error:", error));
             });
         });
     </script>

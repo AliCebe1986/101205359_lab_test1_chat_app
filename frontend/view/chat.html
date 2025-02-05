@@ -11,6 +11,8 @@
 <body>
     <div class="container">
         <h2>Welcome, <span id="username"></span></h2>
+        <button id="logout">Logout</button>
+
         <label for="roomSelect">Choose a Room:</label>
         <select id="roomSelect">
             <option value="devops">DevOps</option>
@@ -28,35 +30,115 @@
             <button id="sendMessage">Send</button>
             <button id="leaveRoom">Leave Room</button>
         </div>
+
+        <h3>Private Chat</h3>
+        <label for="userSelect">Select User:</label>
+        <select id="userSelect"></select>
+        <button id="loadPrivateChat">Load Chat</button>
+
+        <div id="privateMessages"></div>
+        <input type="text" id="privateMessage" placeholder="Type a private message...">
+        <button id="sendPrivateMessage">Send Private Message</button>
     </div>
 
     <script>
         const socket = io("http://localhost:5000");
+        const username = localStorage.getItem("username");
 
-        $(document).ready(function(){
-            $("#username").text(localStorage.getItem("username"));
+        if (!username) {
+            window.location.href = "login.html";
+        }
 
-            $("#joinRoom").click(function(){
+        $(document).ready(function () {
+            $("#username").text(username);
+
+            $("#logout").click(function () {
+                localStorage.removeItem("username");
+                localStorage.removeItem("token");
+                window.location.href = "login.html";
+            });
+
+            // Load users for private chat
+            fetch("http://localhost:5000/auth/users")
+                .then(response => response.json())
+                .then(users => {
+                    users.forEach(user => {
+                        if (user.username !== username) {
+                            $("#userSelect").append(new Option(user.username, user.username));
+                        }
+                    });
+                });
+
+            $("#joinRoom").click(function () {
                 const room = $("#roomSelect").val();
                 $("#currentRoom").text(room);
                 $("#chatBox").show();
                 socket.emit("joinRoom", { room });
+
+                fetch(`http://localhost:5000/chat/group/${room}`)
+                    .then(response => response.json())
+                    .then(messages => {
+                        $("#messages").empty();
+                        messages.forEach(msg => {
+                            $("#messages").append(`<p><b>${msg.from_user}:</b> ${msg.message}</p>`);
+                        });
+                    });
             });
 
-            $("#sendMessage").click(function(){
+            $("#sendMessage").click(function () {
                 const message = $("#messageInput").val();
                 const room = $("#currentRoom").text();
-                socket.emit("chatMessage", { room, message });
+
+                if (!message) return;
+
+                socket.emit("chatMessage", { room, from_user: username, message });
+
+                fetch("http://localhost:5000/chat/group", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ from_user: username, room, message })
+                });
+
                 $("#messageInput").val("");
             });
 
             socket.on("message", (message) => {
-                $("#messages").append(`<p>${message}</p>`);
+                $("#messages").append(`<p><b>${message.from_user}:</b> ${message.message}</p>`);
             });
 
-            $("#leaveRoom").click(function(){
-                $("#chatBox").hide();
-                $("#messages").empty();
+            $("#loadPrivateChat").click(function () {
+                const toUser = $("#userSelect").val();
+                if (!toUser) return;
+
+                fetch(`http://localhost:5000/chat/private/${username}/${toUser}`)
+                    .then(response => response.json())
+                    .then(messages => {
+                        $("#privateMessages").empty();
+                        messages.forEach(msg => {
+                            $("#privateMessages").append(`<p><b>${msg.from_user}:</b> ${msg.message}</p>`);
+                        });
+                    });
+            });
+
+            $("#sendPrivateMessage").click(function () {
+                const toUser = $("#userSelect").val();
+                const message = $("#privateMessage").val();
+
+                if (!toUser || !message) return;
+
+                socket.emit("privateMessage", { from_user: username, to_user: toUser, message });
+
+                fetch("http://localhost:5000/chat/private", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ from_user: username, to_user: toUser, message })
+                });
+
+                $("#privateMessage").val("");
+            });
+
+            socket.on("privateMessage", (message) => {
+                $("#privateMessages").append(`<p><b>${message.from_user} to ${message.to_user}:</b> ${message.message}</p>`);
             });
         });
     </script>
