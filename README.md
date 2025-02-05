@@ -31,12 +31,12 @@ This is a **real-time chat application** built with **Node.js, Express, Socket.i
 ## 📌 Screenshots
 
 ### 1️⃣ Signup Page
-![Signup](screenshots/signup.png)
+![Signup](screenshots/Signup.png)
 
 ### 2️⃣ Login Page
-![Login](screenshots/login.png)
+![Login](screenshots/Login.png)
 
 ### 3️⃣ Chat Room
-![Chat Room](screenshots/chat.png)
+![Chat Room](screenshots/Chat.png)
 
 
