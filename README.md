@@ -28,27 +28,15 @@ This is a **real-time chat application** built with **Node.js, Express, Socket.i
 - JSON Web Tokens (JWT) (for authentication)
 
 ---
-## **📌 Project Structure
-chat_app
-│── backend/
-│   ├── models/        # Database Schemas
-│   │   ├── User.js
-│   │   ├── GroupMessage.js
-│   │   ├── PrivateMessage.js
-│   ├── routes/        # API Routes
-│   │   ├── authRoutes.js
-│   │   ├── chatRoutes.js
-│   ├── server.js      # Main Server File
-│   ├── config.js      # Database Configuration
-│   ├── .env 
-│── frontend/
-│   ├── view/
-│   │   ├── signup.html
-│   │   ├── login.html
-│   │   ├── chat.html
-│   ├── assets/
-│   │   ├── styles.css
-│   │   ├── app.js
-│── package.json
-│── README.md
+## 📌 Screenshots
+
+### 1️⃣ Signup Page
+![Signup](screenshots/signup.png)
+
+### 2️⃣ Login Page
+![Login](screenshots/login.png)
+
+### 3️⃣ Chat Room
+![Chat Room](screenshots/chat.png)
+
 
