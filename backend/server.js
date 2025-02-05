@@ -48,15 +48,14 @@ io.on("connection", (socket) => {
     });
 
     socket.on("privateMessage", ({ from_user, to_user, message }) => {
-        const privateRoom = [from_user, to_user].sort().join("_");
-        socket.join(privateRoom);
-        io.to(privateRoom).emit("privateMessage", { from_user, to_user, message });
+        io.to(to_user).emit("privateMessage", { from_user, to_user, message });
     });
 
     socket.on("disconnect", () => {
         console.log("User disconnected");
     });
 });
+
 
 
 

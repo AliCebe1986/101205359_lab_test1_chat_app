@@ -30,6 +30,14 @@ router.post('/login', async (req, res) => {
     }
 });
 
+router.get('/users', async (req, res) => {
+    try {
+        const users = await User.find({}, 'username');
+        res.json(users);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
 
 router.post('/logout', (req, res) => {
     res.json({ message: "User logged out" });
