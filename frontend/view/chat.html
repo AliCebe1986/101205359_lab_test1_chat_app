@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Room</title>
+    <link rel="stylesheet" href="../assets/styles.css">
+    <script src="https://cdn.socket.io/4.0.1/socket.io.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h2>Welcome, <span id="username"></span></h2>
+        <label for="roomSelect">Choose a Room:</label>
+        <select id="roomSelect">
+            <option value="devops">DevOps</option>
+            <option value="cloud computing">Cloud Computing</option>
+            <option value="covid19">COVID-19</option>
+            <option value="sports">Sports</option>
+            <option value="nodeJS">NodeJS</option>
+        </select>
+        <button id="joinRoom">Join Room</button>
+        
+        <div id="chatBox" style="display:none;">
+            <h3>Chat Room: <span id="currentRoom"></span></h3>
+            <div id="messages"></div>
+            <input type="text" id="messageInput" placeholder="Type a message...">
+            <button id="sendMessage">Send</button>
+            <button id="leaveRoom">Leave Room</button>
+        </div>
+    </div>
+
+    <script>
+        const socket = io("http://localhost:5000");
+
+        $(document).ready(function(){
+            $("#username").text(localStorage.getItem("username"));
+
+            $("#joinRoom").click(function(){
+                const room = $("#roomSelect").val();
+                $("#currentRoom").text(room);
+                $("#chatBox").show();
+                socket.emit("joinRoom", { room });
+            });
+
+            $("#sendMessage").click(function(){
+                const message = $("#messageInput").val();
+                const room = $("#currentRoom").text();
+                socket.emit("chatMessage", { room, message });
+                $("#messageInput").val("");
+            });
+
+            socket.on("message", (message) => {
+                $("#messages").append(`<p>${message}</p>`);
+            });
+
+            $("#leaveRoom").click(function(){
+                $("#chatBox").hide();
+                $("#messages").empty();
+            });
+        });
+    </script>
+</body>
+</html>
